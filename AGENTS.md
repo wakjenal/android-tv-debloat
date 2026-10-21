@@ -59,7 +59,7 @@ reach the TV (below) — and if so, tell them plainly why before switching.
 | 2 | Plan | — | Classify packages (see below). Show the plan. Ask preference questions. |
 | 3 | Debloat | `02-debloat.sh lists/<batch>.txt` | One list file per batch, written by you after approval |
 | 4 | DNS (optional) | `03-adblock-dns.sh` / `off` | Private DNS → AdGuard; not YouTube ads |
-| 5 | Launcher | `04-install-launcher.sh` | Installs `dist/TvHome.apk` (or `--build` from source), opens it, tests keys |
+| 5 | Launcher | `04-install-launcher.sh` | Installs `state/TvHome.apk` (or `--build` from source, which is a **release** build). `dist/TvHome.apk` is a debug build: do not install it as-is |
 | 6 | Activate | `05-activate-launcher.sh` | Lists HOME apps, handles the stock launcher, sets default home, verifies |
 | 7 | Personalise | `06-config.sh` | Writes `home.conf` (dock, columns, hidden apps, football team). Look at the grid screenshot: any maker helper apps showing as tiles go in `--hidden` |
 | 8 | Verify | `07-verify-hardening.sh` | Read-only: launcher not debuggable, HOME resolves to it, Private DNS still AdGuard, core packages kept |

@@ -6,8 +6,8 @@ the same reasoning applies to any Android TV / Google TV device.
 
 ## The launcher must not be debuggable
 
-**This was a real hole in `dist/TvHome.apk` before this branch.** The shipped APK had been produced by
-`./gradlew assembleDebug`, so the installed package reported:
+**`dist/TvHome.apk` in this repo is still a debug build.** It was produced by `./gradlew assembleDebug`, so an installed
+package reports:
 
 ```
 flags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ]
@@ -26,8 +26,14 @@ package of the attacker's choosing; on a launcher that is also a `HOME` handler 
 ### Check any TvHome build before installing
 
 ```bash
-# 1. Is the flag present in the APK's manifest?
-aapt dump xmltree dist/TvHome.apk AndroidManifest.xml | grep -i debuggable    # no output = good
+# 1. Is the flag true in the APK's manifest?
+#    aapt encodes the boolean: 0xffffffff = true, 0x0 = false. A release manifest may still say
+#    android:debuggable="false", which is harmless - only 0xffffffff (or ="true") is a problem.
+aapt dump xmltree dist/TvHome.apk AndroidManifest.xml | grep -i debuggable
+#   bad : android:debuggable(0x0101000f)=(type 0x12)0xffffffff
+#   good: android:debuggable(0x0101000f)=(type 0x12)0x0   (or no line at all)
+
+#    scripts/test-debuggable-guard.sh covers this decision in both directions.
 
 # 2. Or ask the TV after installing (definitive):
 adb shell dumpsys package net.amirul.tvhome | grep -m1 'flags='

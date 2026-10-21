@@ -94,6 +94,10 @@ The agent follows **[AGENTS.md](AGENTS.md)**.
 
 ## Just the launcher (no AI)
 
+> ⚠️ The prebuilt `dist/TvHome.apk` in this repo is a **debug** build (`android:debuggable="true"`), which lets any ADB
+> shell read/write the launcher's private prefs via `run-as`. Build a release APK with `./scripts/04-install-launcher.sh --build`,
+> or let the installer refuse it. See [docs/SECURITY.md](docs/SECURITY.md).
+
 Download **[TvHome.apk](https://github.com/amirulmzlan/android-tv-debloat/releases/latest/download/TvHome.apk)** from the [latest release](https://github.com/amirulmzlan/android-tv-debloat/releases/latest) (also in [`dist/`](dist/); SHA-256 in `dist/TvHome.apk.sha256`), then:
 ```
 adb connect <tv-ip>:5555

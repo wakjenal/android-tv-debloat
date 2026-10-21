@@ -44,9 +44,10 @@ Android SDK (platform 33, build-tools 36) + JDK 17: `./scripts/04-install-launch
 
 > ⚠️ **Build `release`, never `debug`.** A debug build sets `android:debuggable="true"` in the manifest, and on Android TV
 > that lets **any ADB shell** read and write the launcher's private files with `run-as net.amirul.tvhome` — including
-> `shared_prefs/home.xml`, whose `gridPkg` decides what the home screen focuses. `dist/TvHome.apk` used to be a debug
-> build; `04-install-launcher.sh` now refuses to install a debuggable APK and `07-verify-hardening.sh` checks the
-> installed package. See [SECURITY.md](SECURITY.md).
+> `shared_prefs/home.xml`, whose `gridPkg` decides what the home screen focuses. The `dist/TvHome.apk` currently in this
+> repo **is still a debug build** (`android:debuggable="true"`); rebuild it with `--build` to get a release APK.
+> `04-install-launcher.sh` refuses to install a debuggable APK and `07-verify-hardening.sh` checks the installed package.
+> See [SECURITY.md](SECURITY.md).
 
 The release build needs a keystore. Create it once (it lives in `state/`, which git ignores — **never commit it**):
 
