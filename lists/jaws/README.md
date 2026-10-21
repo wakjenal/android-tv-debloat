@@ -10,7 +10,7 @@ A complete, tested debloat profile for the **global** Mi Box S 2nd gen. Verified
 ## Quick start
 
 ```bash
-./scripts/01-connect-and-backup.sh 192.168.0.25        # read-only backup, approve the TV dialog
+./scripts/01-connect-and-backup.sh 192.168.1.50        # read-only backup, approve the TV dialog
 ./scripts/02-debloat.sh lists/jaws/01-telemetry.txt    # then 02, 03 ... one batch at a time
 ./scripts/03-adblock-dns.sh                            # AdGuard Private DNS (optional)
 ./scripts/04-install-launcher.sh --build               # release build (needs JDK 17 + Android SDK)
