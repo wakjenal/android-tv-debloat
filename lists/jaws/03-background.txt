@@ -1,0 +1,11 @@
+# jaws Android 14 - batch 3: background services that do nothing useful on a TV
+# Print spooler: no printing on this box.
+com.android.printspooler
+# Calendar sync adapter: harmless, but it is a background service with no TV UI.
+com.google.android.syncadapters.calendar
+# Xiaomi OTA client. ASK FIRST if the person wants automatic firmware updates. Disabled here on purpose:
+# firmware updates on this box can re-enable debloated packages. Restore with pm enable if wanted.
+com.xiaomi.mitv.updateservice
+# Xiaomi screen-cast / wireless display helpers (Miracast is not exposed in the TV UI on this firmware)
+com.xiaomi.mitv.smartshare
+com.xiaomi.wfdsinkhelperservice

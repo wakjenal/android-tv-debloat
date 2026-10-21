@@ -10,11 +10,12 @@
 ![Launcher](https://img.shields.io/badge/launcher-Android%209%2B-555)
 ![Not Tizen/webOS](https://img.shields.io/badge/Samsung%20Tizen%20%C2%B7%20LG%20webOS-not%20supported-lightgrey)
 
-> ✅ **Works on Android TV** (TVs, boxes and sticks). Tested end to end on a real Android TV — Xiaomi Mi TV (MiTV-MSSP2, Android TV 9):
-> 28 bloat packages disabled, ad-blocking DNS on, TvHome set as the home screen, and HDMI inputs, Live TV, the remote,
-> Bluetooth, Chromecast and all streaming apps still working. Other Android TV / Google TV brands use the same system
-> and should work the same way ([compatibility](docs/COMPATIBILITY.md)). Samsung (Tizen) and LG (webOS) TVs aren't Android,
-> so they can't.
+> ✅ **Works on Android TV** (TVs, boxes and sticks). Tested end to end on two real devices — a Xiaomi Mi TV
+> (**MiTV-MSSP2, Android 9**) and a Xiaomi **Mi Box S 2nd gen (MiTV-AFKR0 "jaws", Google TV / Android 14)**:
+> 28 and 29 bloat packages disabled respectively, ad-blocking DNS on, TvHome set as the home screen, and HDMI inputs,
+> Live TV, the remote, Bluetooth, Chromecast and all streaming apps still working. Other Android TV / Google TV brands
+> use the same system and should work the same way ([compatibility](docs/COMPATIBILITY.md)). Samsung (Tizen) and
+> LG (webOS) TVs aren't Android, so they can't.
 
 ![Before and after](docs/img/before-after.png)
 
@@ -106,9 +107,10 @@ for settings (dock apps, columns, football team, wallpaper) and the Google TV ca
 ## Undo
 
 ```
-./scripts/restore.sh            # re-enable everything, DNS back to automatic, stock home back
-./scripts/restore.sh <package>  # just one app
-adb uninstall net.amirul.tvhome # remove the launcher
+./scripts/restore.sh             # re-enable everything and the stock home; Private DNS is left alone
+./scripts/restore.sh --reset-dns # ...and also put Private DNS back to automatic
+./scripts/restore.sh <package>   # just one app
+adb uninstall net.amirul.tvhome  # remove the launcher
 ```
 Without a computer: Settings → Apps → See all apps → Show system apps → pick the app → **Enable**.
 
@@ -118,6 +120,9 @@ Without a computer: Settings → Apps → See all apps → Show system apps → 
   remote and Bluetooth pairing, keyboard, Play Store/Services). Unclear packages are checked or left alone.
 - Changes go in **small batches with a screenshot after each**, so a problem is caught immediately and is easy to undo.
 - At the end it **switches ADB off** — leaving it on lets devices on your network control the TV.
+- The launcher is **built as a release variant** and `04-install-launcher.sh` refuses to install an APK that is
+  `android:debuggable="true"` — a debuggable HOME app can be read and written from any ADB shell via `run-as`
+  ([docs/SECURITY.md](docs/SECURITY.md)). `07-verify-hardening.sh` checks the installed package.
 - Some TVs reject custom launchers (see [examples/README.md](examples/README.md)); then you still get the debloat.
 - You're changing your own device's settings at your own risk; this isn't affiliated with Google, Xiaomi or any TV maker.
 
@@ -129,7 +134,7 @@ Without a computer: Settings → Apps → See all apps → Show system apps → 
 | [AGENTS.md](AGENTS.md) | The playbook the agent follows (rules, phases, gotchas) |
 | `scripts/` | Backup, debloat-by-batch, DNS, launcher install/activate/config, restore, close ADB |
 | `launcher/` | TvHome source (Java, Android 9+) |
-| [docs/](docs/) | Compatibility, package reference, troubleshooting, launcher settings, remote TVs via Tailscale, sandboxed agents |
+| [docs/](docs/) | Compatibility, package reference, troubleshooting, launcher settings, **security notes**, remote TVs via Tailscale, sandboxed agents |
 | [examples/](examples/) | Tested devices and what each needed — add yours! |
 
 ## Which TVs?
@@ -142,6 +147,7 @@ Android. New Fire TV sticks with **Vega OS** can't either. Full list, partial ca
 | Tested | Android | Result |
 |---|---|---|
 | Xiaomi Mi TV MiTV-MSSP2 (global) | 9 | Debloat (28 packages) + DNS + TvHome ✅ — [notes](examples/xiaomi-mitv-mssp2.md) |
+| Xiaomi Mi Box S 2nd gen MiTV-AFKR0 "jaws" (global) | 14 | Debloat (29 packages) + AdGuard DNS + TvHome ✅ — [notes](examples/xiaomi-mitv-afkr0-jaws.md) · [profile](lists/jaws/) |
 
 Tried it on another TV? Open an issue or pull request with an `examples/` file — that's how the playbook gets better.
 

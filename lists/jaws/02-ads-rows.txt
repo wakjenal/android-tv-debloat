@@ -1,0 +1,7 @@
+# jaws Android 14 - batch 2: PatchWall ads, content rows, Xiaomi content services
+# These feed the stock Xiaomi home/rows. None are load-bearing on this box.
+com.mitv.tvhome.michannel
+com.mitv.tvhome.mitvplus
+com.mitv.tvhome.oemtab
+com.xm.webcontent
+com.xiaomi.tvqs.overseas

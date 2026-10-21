@@ -1,0 +1,13 @@
+# jaws Android 14 - batch 4: preloaded apps nobody asked for
+# Disabled, not uninstalled - all reversible with pm enable / scripts/restore.sh.
+com.mitv.gallery
+com.xiaomi.mimusic2
+com.xiaomi.mitv.mediaexplorer
+com.google.android.play.games
+com.google.android.videos
+com.google.android.youtube.tvmusic
+# Google TV ambient screensaver. CHECK FIRST: settings get secure screensaver_components
+#   If it names dreamx, disabling it makes the TV go to sleep (black) when idle instead of showing ambient.
+com.google.android.apps.tv.dreamx
+# TalkBack - only if nobody uses the screen reader
+com.google.android.marvin.talkback

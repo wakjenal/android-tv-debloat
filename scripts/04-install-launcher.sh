@@ -11,14 +11,30 @@ case "${1:-}" in
   --build)
     export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
     [ -d "$ANDROID_HOME" ] || export ANDROID_HOME="$HOME/Android/Sdk"
+    [ -d "$ANDROID_HOME" ] || export ANDROID_HOME="/usr/lib/android-sdk"
     command -v /usr/libexec/java_home >/dev/null && export JAVA_HOME="$(/usr/libexec/java_home -v 17 2>/dev/null || echo "${JAVA_HOME:-}")"
+    case "${JAVA_HOME:-}" in *jdk-1[789]*|*java-1[789]*) : ;; *)
+      command -v javac >/dev/null && echo "   NOTE: Gradle 8.5.2 wants JDK 17; \`javac -version\` says $(javac -version 2>&1)";; esac
     cd "$ROOT/launcher"; echo "sdk.dir=$ANDROID_HOME" > local.properties
+    # Release, not debug: a debug build is android:debuggable="true", which lets any ADB shell read/write
+    # the launcher's private prefs via run-as. See docs/SECURITY.md.
+    if [ ! -f "$ROOT/state/keystore.properties" ]; then
+      echo "!! No state/keystore.properties - a release build needs a signing keystore."
+      echo "   Create one (once, keep it out of git):"
+      echo "     mkdir -p $ROOT/state"
+      echo "     keytool -genkeypair -keystore $ROOT/state/tvhome.keystore -alias tvhome \\"
+      echo "       -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=TvHome, O=Local, C=MY'"
+      echo "     printf 'storeFile=../state/tvhome.keystore\\nstorePassword=CHANGE_ME\\nkeyAlias=tvhome\\nkeyPassword=CHANGE_ME\\n' \\"
+      echo "       > $ROOT/state/keystore.properties && chmod 600 $ROOT/state/keystore.properties"
+      echo "   Or install a pre-built APK: ./scripts/04-install-launcher.sh <file.apk>"
+      exit 1
+    fi
     if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
       T=$(mktemp -d); ( cd "$T" && touch settings.gradle && gradle -q wrapper --gradle-version 8.7 --distribution-type all ) || { echo "!! needs 'gradle' once to create the wrapper"; exit 1; }
       cp -R "$T/gradlew" "$T/gradlew.bat" "$T/gradle" . ; rm -rf "$T"
     fi
-    chmod +x gradlew; ./gradlew --no-daemon -q assembleDebug || { echo "!! BUILD FAILED"; exit 1; }
-    cp app/build/outputs/apk/debug/app-debug.apk "$APK"; cd "$ROOT";;
+    chmod +x gradlew; ./gradlew --no-daemon -q assembleRelease || { echo "!! BUILD FAILED"; exit 1; }
+    cp app/build/outputs/apk/release/app-release.apk "$APK"; cd "$ROOT";;
   "")
     REPO="${REPO:-$(git -C "$ROOT" remote get-url origin 2>/dev/null | sed -E 's#.*github.com[:/]##; s#\.git$##')}"
     REPO="${REPO:-amirulmzlan/android-tv-debloat}"
@@ -32,6 +48,31 @@ case "${1:-}" in
   *) cp "$1" "$APK";;
 esac
 echo "== APK: $(wc -c < "$APK" | tr -d ' ') bytes"
+
+# Refuse a debuggable APK. A debug TvHome lets any ADB shell read/write its private prefs via run-as on
+# Android TV (docs/SECURITY.md). Check the manifest before it ever reaches the TV.
+# NOTE: aapt shows aapt's binary encoding: android:debuggable=(type 0x12)0xffffffff is TRUE, 0x0 is false.
+# Many release manifests still carry android:debuggable="false" explicitly, which is harmless - only reject true.
+manifest_debuggable() {
+  if command -v aapt >/dev/null 2>&1; then
+    aapt dump xmltree "$1" AndroidManifest.xml 2>/dev/null | grep -i 'debuggable' | grep -qiE '0xffffffff|="true"'
+  elif command -v apkanalyzer >/dev/null 2>&1; then
+    apkanalyzer manifest print "$1" 2>/dev/null | grep -i 'debuggable' | grep -qi 'true'
+  else
+    return 2   # cannot tell
+  fi
+}
+manifest_debuggable "$APK"; MD=$?
+case "$MD" in
+  0) echo "!! REFUSING: $APK declares android:debuggable=\"true\"."
+     echo "   A debuggable HOME app can be taken over from any ADB shell (run-as). Build with --build (release)"
+     echo "   or strip it first. See docs/SECURITY.md."
+     exit 1 ;;
+  2) echo "   NOTE: aapt/apkanalyzer not found - cannot pre-check the manifest for android:debuggable."
+     echo "         scripts/07-verify-hardening.sh will check the installed package." ;;
+  *) echo "   manifest: not debuggable OK" ;;
+esac
+
 [ -f "$ROOT/state/stock-home.txt" ] || S cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME | tail -1 > "$ROOT/state/stock-home.txt"
 echo "== Installing (if this hangs on Android 14, look at the TV for a confirmation)"
 if ! A install -r "$APK"; then

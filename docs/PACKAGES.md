@@ -9,7 +9,7 @@ Legend: ✅ verified on a real TV in this repo · ⚠️ common knowledge / repo
 
 | Package / pattern | Why |
 |---|---|
-| `com.android.vending`, `com.google.android.gms`, `com.google.android.gsf` | Play Store / Play Services — apps break without them |
+| `com.android.vending`, `com.google.android.gms`, `com.google.android.gsf` | Play Store / Play Services — apps break without them. On the Xiaomi Android 14 box `com.android.vending` is also the **package verifier**, so uninstalling it breaks every later install |
 | `com.android.tv.settings`, `com.android.settings`, `com.android.systemui`, `com.android.providers.*`, `android` | Core system |
 | `com.android.providers.tv` | TV channel/program database used by the TV input framework |
 | Packages with **`tvinput`**, **`tvcenter`**, **`livetv`**, **`hdmi`**, **`cec`**, **`tuner`**, **`dtv`** in the name | TV inputs, HDMI, tuner, Live TV |
@@ -49,10 +49,31 @@ disable it** — or set another screensaver first. With no screensaver left, And
 
 ## Xiaomi (PatchWall) ✅
 
-See [examples/xiaomi-mitv-mssp2.md](../examples/xiaomi-mitv-mssp2.md) — telemetry `com.miui.tv.analytics`,
-`com.xiaomi.statistic`; ads/content `com.mitv.tvhome.atv`, `com.mitv.tvhome.michannel`, `com.xm.webcontent`;
-update service `com.xiaomi.mitv.updateservice` (ask). Keep `com.xiaomi.mitv.tvmanager`, `mitv.service`,
-`com.xiaomi.android.tvsetup.partnercustomizer`, `com.mstar.netflixobserver` (Netflix button).
+Two tested firmwares, and they are **not** identical — use the file that matches the box.
+
+**Android TV 9 — MiTV-MSSP2** → [examples/xiaomi-mitv-mssp2.md](../examples/xiaomi-mitv-mssp2.md):
+telemetry `com.miui.tv.analytics`, `com.xiaomi.statistic`; ads/content `com.mitv.tvhome.atv`,
+`com.mitv.tvhome.michannel`, `com.xm.webcontent`; update service `com.xiaomi.mitv.updateservice` (ask).
+Keep `com.xiaomi.mitv.tvmanager`, `mitv.service`, `com.xiaomi.android.tvsetup.partnercustomizer`,
+`com.mstar.netflixobserver` (Netflix button).
+
+**Android 14 / Google TV — MiTV-AFKR0 "jaws"** → [examples/xiaomi-mitv-afkr0-jaws.md](../examples/xiaomi-mitv-afkr0-jaws.md),
+batch lists in [lists/jaws/](../lists/jaws/). Differences that bit on the real box:
+
+- `com.google.android.apps.tv.launcherx` is the stock home with **HOME priority 2** — it must be disabled, not just
+  out-voted by `set-home-activity`.
+- Extra Xiaomi packages that don't exist on Android 9: `com.mitv.tvhome.mitvplus`, `com.mitv.tvhome.oemtab`,
+  `com.xiaomi.tvqs.overseas`, `com.xiaomi.mimusic2`, `com.xiaomi.mitv.mediaexplorer`, `com.xiaomi.mitv.smartshare`,
+  `com.xiaomi.wfdsinkhelperservice`, plus the `dreamx` screensaver and Google TV `axel` rows.
+- `com.mitv.tvhome.atv` (PatchWall) is **absent after removal** on Android 14 — it needs
+  `pm uninstall --user 0` *and* `settings put global patchwall_enable 0`, then two reboots, or `LaunchOtherAppsUtils`
+  force-starts it again. It is a system APK on `/product`, so `pm install-existing` restores it.
+- `com.xiaomi.mitv.updateservice` still exists but the OTA client is more aggressive here: disabling it is safe but
+  means no firmware updates. Ask.
+- `com.android.vending` lives in `/product/priv-app/Tubesky`. It is the **package verifier** on this box: removing it
+  silently breaks installs. Never disable or uninstall it.
+- Some appops (`REQUEST_INSTALL_PACKAGES`) **do not survive a reboot** on Android 14; `pm revoke` of runtime
+  permissions does. See [docs/SECURITY.md](../docs/SECURITY.md).
 
 ## Other makers — how to tell
 

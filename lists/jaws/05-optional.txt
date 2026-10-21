@@ -1,0 +1,15 @@
+# jaws Android 14 - batch 5: preference-dependent. ASK THE PERSON before applying any line here.
+#
+# Chromecast built-in. Disable only if they never cast from a phone.
+com.google.android.apps.mediashell
+# Google TV phone remote service. Disable only if they never use the Google TV app as a remote.
+com.google.android.tv.remote.service
+# Google TV "what to watch" / axel content rows.
+com.google.android.tv.axel
+# Google TV setup wizard. On this box it does NOT claim HOME and does NOT own the saved Wi-Fi after setup,
+# so disabling is safe here - but verify on another unit first:
+#   dumpsys wifi | grep -o 'cname=[^ ]*'    (if it owns the network, ask the person to forget + re-join first)
+com.google.android.tungsten.setupwraith
+# Xiaomi partner customiser. It also carries the Bluetooth-remote pairing screen, so only disable it once the
+# remote is already paired and staying paired.
+com.xiaomi.android.tvsetup.partnercustomizer

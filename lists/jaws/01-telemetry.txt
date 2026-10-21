@@ -1,0 +1,11 @@
+# jaws Android 14 - batch 1: telemetry, analytics, feedback
+# Verified on MiTV-AFKR0 / V816.0.26.4.17.UZFAABX. Disable-only (pm disable-user --user 0).
+# Xiaomi telemetry
+com.miui.tv.analytics
+com.xiaomi.statistic
+# Google feedback / bug reports
+com.google.android.feedback
+# Android statementservice - verifies App Links; nothing on this TV needs it
+com.android.statementservice
+# Google partner setup - pushes partner app configs at boot
+com.google.android.partnersetup

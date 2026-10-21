@@ -11,4 +11,5 @@ Each file starts with a header that tells an agent which case the TV is. Add you
 
 | File | Device | Case |
 |---|---|---|
-| [xiaomi-mitv-mssp2.md](xiaomi-mitv-mssp2.md) | Xiaomi Mi TV (MiTV-MSSP2, global), Android 9 | A |
+| [xiaomi-mitv-mssp2.md](xiaomi-mitv-mssp2.md) | Xiaomi Mi TV (MiTV-MSSP2, global), Android TV 9 | A |
+| [xiaomi-mitv-afkr0-jaws.md](xiaomi-mitv-afkr0-jaws.md) | Xiaomi Mi Box S 2nd gen (MiTV-AFKR0 "jaws", global), **Google TV / Android 14, 32-bit** | A |

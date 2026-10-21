@@ -62,9 +62,11 @@ reach the TV (below) — and if so, tell them plainly why before switching.
 | 5 | Launcher | `04-install-launcher.sh` | Installs `dist/TvHome.apk` (or `--build` from source), opens it, tests keys |
 | 6 | Activate | `05-activate-launcher.sh` | Lists HOME apps, handles the stock launcher, sets default home, verifies |
 | 7 | Personalise | `06-config.sh` | Writes `home.conf` (dock, columns, hidden apps, football team). Look at the grid screenshot: any maker helper apps showing as tiles go in `--hidden` |
-| 8 | Finish | `close-adb.sh` | Summary for the person; restore instructions |
+| 8 | Verify | `07-verify-hardening.sh` | Read-only: launcher not debuggable, HOME resolves to it, Private DNS still AdGuard, core packages kept |
+| 9 | Finish | `close-adb.sh` | Summary for the person; restore instructions |
 
-Helpers: `status.sh` (reachable? top app? Wi-Fi? crashes?), `restore.sh [pkg]`, `uninstall.sh <pkg...>`.
+Helpers: `status.sh` (reachable? top app? Wi-Fi? crashes?), `restore.sh [--keep-dns|--reset-dns] [pkg]`,
+`uninstall.sh <pkg...>`, `07-verify-hardening.sh` (launcher not debuggable, HOME, Private DNS, core packages kept).
 
 ## Classifying packages
 
@@ -90,6 +92,13 @@ that are common to most Android TVs and name patterns that are usually safe / us
   network in Settings first. If it doesn't claim HOME, leave it enabled.
 - **Android 11+ package visibility**: TvHome declares `<queries>` for LEANBACK_LAUNCHER/LAUNCHER already.
 - **Android 14** may wait for an on-screen confirmation during `adb install`; push the APK and `pm install -r`.
+- **Never install a debuggable launcher.** A debug build of TvHome carries `android:debuggable="true"`, and on Android TV
+  any ADB shell can then `run-as net.amirul.tvhome` and read/write `shared_prefs/home.xml` (including `gridPkg`).
+  Build with `--build` (release variant) or let `04-install-launcher.sh` refuse the APK. Check the installed package with
+  `dumpsys package net.amirul.tvhome | grep -m1 flags=` — `DEBUGGABLE` must not appear. `scripts/07-verify-hardening.sh`
+  does this, plus DNS and HOME checks.
+- **32-bit boxes.** On the Mi Box S 2nd gen (`MiTV-AFKR0`, Android 14) `ro.product.cpu.abilist64` is empty: any APK you
+  sideload must be `armeabi-v7a` or universal, or it fails with `INSTALL_FAILED_NO_MATCHING_ABIS`.
 
 ## Fallback: when you can't reach the TV yourself
 

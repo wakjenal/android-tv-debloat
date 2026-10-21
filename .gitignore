@@ -3,6 +3,10 @@ backup/
 state/
 shots/
 .tv_ip
+# signing material - never commit a private keystore or its passwords
+*.keystore
+*.jks
+keystore.properties
 # build output
 launcher/**/build/
 launcher/.gradle/
@@ -11,4 +15,7 @@ launcher/local.properties
 .DS_Store
 lists/*
 !lists/README.md
+# but commit the tested per-device profiles
+!lists/jaws/
+!lists/jaws/**
 !dist/TvHome.apk
